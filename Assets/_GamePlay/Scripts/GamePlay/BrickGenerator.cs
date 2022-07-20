@@ -28,7 +28,7 @@ public class BrickGenerator : MonoBehaviour
     private Vector3 startPoint;
     private Vector3 position;
 
-    private int length = 24;
+    private int length = 30;
     private int line = 6;
     private int xOrder = 0;
 
@@ -36,17 +36,17 @@ public class BrickGenerator : MonoBehaviour
     private float xPosition;
 
     public const string Color_BRICKCOLOR = "_Color";
+
+    public Brick brick;
+
     private void Start()
     {
         startPoint = transform.position;
         zPosition = transform.position.z;
         xPosition = transform.position.x;
-
         spawnedBricks = new SpawnedBricks[length];
         CreateBricks();
-
     }
-
     private void CreateBricks()
     {
         for (int i = 0; i < length; i++)
@@ -64,16 +64,19 @@ public class BrickGenerator : MonoBehaviour
             }
 
             Transform createdBrick = Instantiate(BrickPrefab, position, BrickPrefab.transform.rotation, transform);
+
             GiveColor(createdBrick, i);
         }
     }
 
     private void GiveColor(Transform createdBrick, int i)
     {
+        var getComponentBrick = createdBrick.GetComponent<Brick>();
+        var getComponentBrickRenderer = createdBrick.GetComponent<Renderer>();
         int randomColor = Random.Range(0, colorArray.Length);
-        createdBrick.GetComponent<Renderer>().material.SetColor(Color_BRICKCOLOR, colorArray[randomColor].color);
-        createdBrick.GetComponent<Brick>().colorName = colorArray[randomColor].colorName;
-        createdBrick.GetComponent<Brick>().brickNumber = i;
+        getComponentBrickRenderer.material.SetColor(Color_BRICKCOLOR, colorArray[randomColor].color);
+        getComponentBrick.colorName = colorArray[randomColor].colorName;
+        getComponentBrick.brickNumber = i;
 
         InsertIntoArray(colorArray[randomColor].color, colorArray[randomColor].colorName, createdBrick, i);
     }
@@ -81,12 +84,10 @@ public class BrickGenerator : MonoBehaviour
     private void InsertIntoArray(Color _color, string _colorName, Transform createdBrick, int i)
     {
         var tmp = new SpawnedBricks();
-
         tmp.color = _color;
         tmp.colorName = _colorName;
         tmp.position = createdBrick.position;
         tmp.removed = false;
-
         spawnedBricks[i] = tmp;
     }
 
@@ -102,14 +103,15 @@ public class BrickGenerator : MonoBehaviour
             if (spawnedBricks[i].removed == true)
             {
                 Transform createdBrick = Instantiate(BrickPrefab, spawnedBricks[i].position, BrickPrefab.transform.rotation, transform);
-
-                createdBrick.GetComponent<Renderer>().material.SetColor(Color_BRICKCOLOR, spawnedBricks[i].color);
-                createdBrick.GetComponent<Brick>().colorName = spawnedBricks[i].colorName;
-                createdBrick.GetComponent<Brick>().brickNumber = i;
-
+                var getComponentBrick = createdBrick.GetComponent<Brick>();
+                var getComponentBrickRenderer = createdBrick.GetComponent<Renderer>();
+                getComponentBrickRenderer.material.SetColor(Color_BRICKCOLOR, spawnedBricks[i].color);
+                getComponentBrick.colorName = spawnedBricks[i].colorName;
+                getComponentBrick.brickNumber = i;
                 spawnedBricks[i].removed = false;
                 return;
             }
         }
     }
+
 }

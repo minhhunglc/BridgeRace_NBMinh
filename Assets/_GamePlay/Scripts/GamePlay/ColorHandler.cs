@@ -4,15 +4,39 @@ using UnityEngine;
 
 public class ColorHandler : MonoBehaviour
 {
-    // Start is called before the first frame update
+    public BrickGenerator brickGenerator;
+    public PlayerBrickController[] brickController;
+
     void Start()
     {
-        
+
+        ShuffleColors();
+        RandomColors();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void RandomColors()
     {
-        
+        //int randomColor = Random.Range(0, brickGenerator.colorArray.Length);
+
+        PlayerCollectController[] players = FindObjectsOfType<PlayerCollectController>();
+
+        for (int i = 0; i < players.Length; i++)
+        {
+            players[i].gameObject.transform.GetChild(1).GetComponent<Renderer>().material.SetColor("_Color", brickGenerator.colorArray[i].color);
+            players[i].playerColorName = brickGenerator.colorArray[i].colorName;
+            brickController[i].selectedColor = brickGenerator.colorArray[i].color;
+            brickController[i].selectedColorName = brickGenerator.colorArray[i].colorName;
+        }
+    }
+
+    private void ShuffleColors()
+    {
+        for (int t = 0; t < brickGenerator.colorArray.Length; t++)
+        {
+            BrickGenerator.ColorData tmp = brickGenerator.colorArray[t];
+            int r = Random.Range(t, brickGenerator.colorArray.Length);
+            brickGenerator.colorArray[t] = brickGenerator.colorArray[r];
+            brickGenerator.colorArray[r] = tmp;
+        }
     }
 }

@@ -9,7 +9,7 @@ public class GameManager : Singleton<GameManager>
     private GameState gameState;
     private void Awake()
     {
-        Application.targetFrameRate = 60;
+        Application.targetFrameRate = 30;
         Input.multiTouchEnabled = false;
 
         //init data 

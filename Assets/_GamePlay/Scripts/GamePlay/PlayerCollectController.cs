@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerCollectController : MonoBehaviour
+public class PlayerCollectController : Singleton<PlayerCollectController>
 {
     public PlayerBrickController brickController;
     public BrickGenerator brickGenerator;
@@ -10,13 +10,21 @@ public class PlayerCollectController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Brick brick = other.transform.GetComponent<Brick>();
-
-        if (brick.colorName == playerColorName)
+        if (other.CompareTag("Finish"))
         {
-            brickGenerator.MakeRemoved(brick.brickNumber);
-            Destroy(other.gameObject);
-            brickController.UpdatePlayerBricks();
+            VirtualJoystick.Ins.isPlaying = false;
+            VirtualJoystick.Ins.playerAnimator.SetInteger("Result", 2);
+        }
+
+        else
+        {
+            Brick brick = other.transform.GetComponent<Brick>();
+            if (brick.colorName == playerColorName)
+            {
+                brickGenerator.MakeRemoved(brick.brickNumber);
+                Destroy(other.gameObject);
+                brickController.UpdatePlayerBricks();
+            }
         }
     }
 }

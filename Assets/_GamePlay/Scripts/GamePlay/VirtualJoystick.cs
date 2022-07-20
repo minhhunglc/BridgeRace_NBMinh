@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine;
 
-public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, IPointerDownHandler
+public class VirtualJoystick : Singleton<VirtualJoystick>, IDragHandler, IPointerUpHandler, IPointerDownHandler
 {
     #region Test
     //public RectTransform m_rtBack;
@@ -53,26 +53,34 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, I
     #endregion
 
     public Transform playerTransform;
+    public Transform brickArea;
     public Animator playerAnimator;
     public RectTransform pad;
     public float moveSpeed;
     Vector3 move;
     bool isWalking;
+    public bool isPlaying;
+    private void Start()
+    {
+        isPlaying = true;
+    }
     public void OnDrag(PointerEventData eventData)
     {
-        transform.position = eventData.position;
-        transform.localPosition = Vector2.ClampMagnitude(eventData.position - (Vector2)pad.position, pad.rect.width * 0.5f);
-        move = new Vector3(transform.localPosition.x, 0, transform.localPosition.y).normalized;
-
-        if (!isWalking)
+        if (isPlaying == true)
         {
-            isWalking = true;
-            playerAnimator.SetBool("isWalking", true);
-            playerAnimator.SetInteger("Result", 0);
+            transform.position = eventData.position;
+            transform.localPosition = Vector2.ClampMagnitude(eventData.position - (Vector2)pad.position, pad.rect.width * 0.5f);
+            move = new Vector3(transform.localPosition.x, 0, transform.localPosition.y).normalized;
+
+            if (!isWalking)
+            {
+                isWalking = true;
+                playerAnimator.SetBool("isWalking", true);
+                playerAnimator.SetInteger("Result", 0);
+            }
         }
 
     }
-
     public void OnPointerDown(PointerEventData eventData)
     {
         StartCoroutine(PlayerMove());
@@ -91,11 +99,14 @@ public class VirtualJoystick : MonoBehaviour, IDragHandler, IPointerUpHandler, I
     {
         while (true)
         {
-            //player.GetComponent<Rigidbody>().MovePosition(player.position + move * moveSpeed * Time.deltaTime);
-            playerTransform.Translate(move * moveSpeed * Time.deltaTime, Space.World);
+            playerTransform.GetComponent<Rigidbody>().MovePosition(playerTransform.position + move * moveSpeed * Time.deltaTime);
+            //playerTransform.Translate(move * moveSpeed * Time.deltaTime, Space.World);
 
             if (move != Vector3.zero)
+            {
                 playerTransform.rotation = Quaternion.Slerp(playerTransform.rotation, Quaternion.LookRotation(move), 5 * Time.deltaTime);
+                brickArea.eulerAngles = new Vector3(0f, 0f, 0f);
+            }
 
             yield return null;
         }
