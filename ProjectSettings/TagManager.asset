@@ -10,6 +10,14 @@ TagManager:
   - Check
   - Floor
   - BridgeTile
+  - Red
+  - Green
+  - Blue
+  - Set
+  - Final
+  - SetR
+  - SetG
+  - SetB
   layers:
   - Default
   - TransparentFX
@@ -19,7 +27,7 @@ TagManager:
   - UI
   - Ground
   - Brick
-  - Players
+  - Player
   - 
   - 
   - 
