@@ -23,7 +23,6 @@ public class PlayerCollectControl : MonoBehaviour
         {
             gameObject.transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z - 0.5f);
         }
-
     }
 
     private void SubtractBricks(Collider other)

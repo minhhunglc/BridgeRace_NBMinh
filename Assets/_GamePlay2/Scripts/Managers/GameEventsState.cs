@@ -13,7 +13,6 @@ public class GameEventsState : MonoBehaviour
     }
     public event Action<int> onDoorTrigger;
     public event Action<int> offDoorTrigger;
-    public event Action onChamp;
 
     public void DoorEnter(int id)
     {

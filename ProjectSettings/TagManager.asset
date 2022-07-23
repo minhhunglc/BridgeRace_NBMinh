@@ -6,8 +6,6 @@ TagManager:
   tags:
   - Brick
   - Bridge
-  - WallBridge
-  - Check
   - Floor
   - BridgeTile
   - Red
@@ -18,6 +16,7 @@ TagManager:
   - SetR
   - SetG
   - SetB
+  - BotRed
   layers:
   - Default
   - TransparentFX
