@@ -34,6 +34,8 @@ public class PlayerCollectControl : MonoBehaviour
         bricks.RemoveAt(bricks.Count - 1);
         Destroy(obje);
 
+        SimplePool.Despawn(obje);
+
         othergetMeshRenderer.material = transformGetComponent;
         othergetMeshRenderer.enabled = true;
 
@@ -57,5 +59,7 @@ public class PlayerCollectControl : MonoBehaviour
         other.tag = Constant.TAG_UNTAGGED;
 
         BricksGenerate.Ins.GenerateCube(1);
+
+
     }
 }
