@@ -14,10 +14,7 @@ public class LevelManager : Singleton<LevelManager>
     private void Start()
     {
         ReloadLevel();
-        if (currentLevel > 2)
-        {
-            currentLevel = 0;
-        }
+
     }
 
     public void ActiveCurrentLevel()
@@ -44,6 +41,10 @@ public class LevelManager : Singleton<LevelManager>
     {
         currentLevel = PlayerPrefs.GetInt(Constant.PREF_LEVEL);
         ActiveCurrentLevel();
+        if (currentLevel > 2)
+        {
+            currentLevel = 0;
+        }
     }
 
     public void NextLevel()
