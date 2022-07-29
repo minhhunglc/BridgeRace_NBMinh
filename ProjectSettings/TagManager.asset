@@ -4,19 +4,12 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Brick
-  - Bridge
-  - Floor
-  - BridgeTile
-  - Red
-  - Green
-  - Blue
-  - Set
-  - Final
-  - SetR
-  - SetG
-  - SetB
-  - BotRed
+  - Block
+  - Stair
+  - Bot
+  - BlockSpawnArea
+  - Step
+  - Door
   layers:
   - Default
   - TransparentFX
@@ -24,9 +17,9 @@ TagManager:
   - 
   - Water
   - UI
-  - Ground
-  - Brick
-  - Player
+  - Block
+  - Character
+  - Bot
   - 
   - 
   - 
