@@ -4,7 +4,7 @@ using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 
-public class CharacterBase : MonoBehaviour, IAnimationState
+public class CharacterBase : Singleton<CharacterBase>, IAnimationState
 {
     public delegate void Action();
 
@@ -12,8 +12,10 @@ public class CharacterBase : MonoBehaviour, IAnimationState
     [SerializeField] private LayerMask _layerMaskCollision;
 
     [Header("Ground Raycast")]
+    [SerializeField] private LayerMask _layerMaskBlock;
     [SerializeField] private LayerMask _layerMaskGround;
-    [SerializeField] private Transform _rayPoint;
+    [SerializeField] private Transform _rayPointGround;
+    [SerializeField] private Transform _rayPointBlock;
 
     [Header("Speed")]
     [SerializeField] [Range(1, 20)] private float _speed;
@@ -26,6 +28,7 @@ public class CharacterBase : MonoBehaviour, IAnimationState
     [Header("Variables")]
     protected bool IsBot;
     protected bool IsGround;
+    protected bool IsBlock;
     public int score;
 
     [Header("Components")]
@@ -47,7 +50,6 @@ public class CharacterBase : MonoBehaviour, IAnimationState
         bag.SpawnBlocks();
     }
 
-
     #region  Collision
     protected void OnTriggerEnter(Collider other)
     {
@@ -64,7 +66,8 @@ public class CharacterBase : MonoBehaviour, IAnimationState
                 if (collectAction != null)
                     collectAction.Invoke();
 
-                if (b.Id == -1) Destroy(b.gameObject);
+                if (b.Id == -1) SimplePool.Despawn(b);
+
             }
         }
         else if (other.CompareTag(Constant.TAG_STAIR))
@@ -96,7 +99,6 @@ public class CharacterBase : MonoBehaviour, IAnimationState
                 bag.ResetBag();
 
             }
-
             else
             {
                 GameManager.Ins.Win();
@@ -104,35 +106,51 @@ public class CharacterBase : MonoBehaviour, IAnimationState
 
             }
         }
-        if (bag.blockCount == 0 && other.CompareTag(Constant.TAG_STAIR))
-        {
-            ResetVelocity();
-        }
-
     }
 
     protected void OnCollisionEnter(Collision other)
     {
-        if (other.transform.CompareTag(Constant.TAG_STEP))
+        if (other.gameObject.CompareTag(Constant.TAG_BLOCK))
         {
-            if (bag.blockCount > 0)
+            if (bag.BagIsFull()) return;
+
+            Block b = other.gameObject.GetComponent<Block>();
+            if (b.Id == bag.playerId || b.Id == -1)
             {
-                MeshRenderer renderer = other.transform.GetComponent<MeshRenderer>();
-                if (renderer.material.color == bag.color)
-                    return;
+                bag.AddBlock();
+                b.CollectMe();
 
-                renderer.material.color = bag.color;
+                if (collectAction != null)
+                    collectAction.Invoke();
 
-                if (!IsBot)
-                {
-                    Stair s = other.transform.parent.GetComponent<Stair>();
-                    myStair = s;
-                }
-
-                RemoveBlockInBag();
+                if (b.Id == -1) SimplePool.Despawn(b);
             }
         }
+        if (other.transform.CompareTag(Constant.TAG_STEP) && bag.blockCount > 0)
+        {
+            MeshRenderer renderer = other.transform.GetComponent<MeshRenderer>();
+            if (renderer.material.color == bag.color)
+                return;
 
+            renderer.material.color = bag.color;
+
+            if (!IsBot)
+            {
+                Stair s = other.transform.parent.GetComponent<Stair>();
+                myStair = s;
+            }
+
+            RemoveBlockInBag();
+            //else if (bag.blockCount == 0)
+            //{
+            //    MeshRenderer renderer = other.transform.GetComponent<MeshRenderer>();
+            //    if (renderer.material.color != bag.color)
+            //    {
+            //        ResetVelocity();
+            //        Debug.Log("OK");
+            //    }
+            //}
+        }
     }
     #endregion
 
@@ -160,7 +178,7 @@ public class CharacterBase : MonoBehaviour, IAnimationState
         RaycastHit hit;
         if (Physics.Raycast(transform.position, transform.forward, out hit, .6f, _layerMaskCollision))
         {
-            if (hit.collider != null)
+            if (hit.collider != null && hit.transform.GetComponent<CharacterBase>().bag.blockCount < this.bag.blockCount)
             {
                 hit.transform.GetComponent<CharacterBase>().DropAllBlocks();
                 //Fall_Anim();
@@ -187,13 +205,13 @@ public class CharacterBase : MonoBehaviour, IAnimationState
 
     protected void Move(float horizontal, float vertical)
     {
-        Debug.DrawRay(_rayPoint.position, -_rayPoint.up, Color.red);
-        IsGround = Physics.Raycast(_rayPoint.position, -_rayPoint.up, _layerMaskGround);
+        Debug.DrawRay(_rayPointGround.position, -_rayPointGround.up, Color.red);
+        IsGround = Physics.Raycast(_rayPointGround.position, -_rayPointGround.up, _layerMaskGround);
 
         if (vertical != 0 || horizontal != 0)
         {
             Quaternion newRot = Quaternion.Euler(0, (Mathf.Atan2(horizontal, vertical) * 180 / Mathf.PI), 0);
-            transform.rotation = Quaternion.Slerp(transform.rotation, newRot, Time.deltaTime * 2);
+            transform.rotation = Quaternion.Slerp(transform.rotation, newRot, Time.deltaTime * 5);
 
             if (IsGround)
             {
@@ -213,16 +231,22 @@ public class CharacterBase : MonoBehaviour, IAnimationState
             ResetVelocity();
             Idle_Anim();
         }
-
+        RaycastHit hit;
+        if (Physics.Raycast(_rayPointBlock.position, -_rayPointBlock.up, out hit, .6f, _layerMaskBlock))
+        {
+            if (bag.blockCount == 0 && hit.collider.GetComponent<MeshRenderer>().material.color != _mesh.material.color)
+            {
+                ResetVelocity();
+                Idle_Anim();
+            }
+        }
         CollisionDetectionWithCharacter();
     }
-
     protected void ResetVelocity()
     {
         _rigidbody.velocity = new Vector3(0, _rigidbody.velocity.y, 0);
         _rigidbody.angularVelocity *= 0;
     }
-
     public void Running_Anim()
     {
         if (!animator.GetBool(Constant.PREFERENCE_ANIM_RUN))
@@ -231,7 +255,6 @@ public class CharacterBase : MonoBehaviour, IAnimationState
             animator.SetInteger(Constant.PREFERENCE_ANIM_RESULT, 0);
         }
     }
-
     public void Idle_Anim()
     {
         if (animator.GetBool(Constant.PREFERENCE_ANIM_RUN))
@@ -241,7 +264,6 @@ public class CharacterBase : MonoBehaviour, IAnimationState
             animator.SetInteger(Constant.PREFERENCE_ANIM_RESULT, 0);
         }
     }
-
     public void Fall_Anim()
     {
         if (!animator.GetBool(Constant.PREFERENCE_ANIM_FALL))
@@ -250,8 +272,6 @@ public class CharacterBase : MonoBehaviour, IAnimationState
             animator.SetInteger(Constant.PREFERENCE_ANIM_RESULT, 0);
         }
     }
-
-
     public void Win_Anim()
     {
         animator.SetInteger(Constant.PREFERENCE_ANIM_RESULT, 2);

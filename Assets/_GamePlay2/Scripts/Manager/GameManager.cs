@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public enum GameStatus { MainMenu, Playing, GameOver, Win }
 
@@ -9,8 +10,12 @@ public class GameManager : Singleton<GameManager>
 {
     public GameStatus GameStat;
     public Player Player;
+    public int countDownTime;
+    public Text countdownDisplay;
+
     private void Start()
     {
+        //StartCoroutine(CountdownToStart());
         Play();
     }
     public void Play()
@@ -27,6 +32,7 @@ public class GameManager : Singleton<GameManager>
 
         GameStat = GameStatus.GameOver;
         UIManager.Ins.ActivateGameOverPanel(true);
+        SimplePool.CollectAll();
     }
     public void Win()
     {
@@ -35,6 +41,7 @@ public class GameManager : Singleton<GameManager>
 
         GameStat = GameStatus.Win;
         UIManager.Ins.ActivateWinPanel(true);
+        SimplePool.CollectAll();
     }
     public void NextLevel()
     {
@@ -66,5 +73,21 @@ public class GameManager : Singleton<GameManager>
     public void Exit()
     {
         Application.Quit();
+    }
+    IEnumerator CountdownToStart()
+    {
+        Time.timeScale = 0;
+        while (countDownTime > 0)
+        {
+            countdownDisplay.text = countDownTime.ToString();
+            yield return new WaitForSecondsRealtime(1f);
+            countDownTime--;
+        }
+        countdownDisplay.text = "GO";
+        Time.timeScale = 1;
+        Play();
+        yield return new WaitForSecondsRealtime(1f);
+        countdownDisplay.gameObject.SetActive(false);
+
     }
 }

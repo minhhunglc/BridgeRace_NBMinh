@@ -22,6 +22,5 @@ public class Constant : MonoBehaviour
     public static string PREF_LEVEL = "level";
 
     //String
-    public static string STR_DESTROY = "DestroyMe";
     public static string STR_LEVEL = "LEVEL: ";
 }

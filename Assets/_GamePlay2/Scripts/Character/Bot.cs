@@ -25,7 +25,7 @@ public class Bot : CharacterBase
     }
 
     #region Collision
-    private void OnTriggerEnter(Collider other)
+    private new void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag(Constant.TAG_BLOCK))
         {
@@ -49,7 +49,7 @@ public class Bot : CharacterBase
         }
     }
 
-    private void OnCollisionEnter(Collision other)
+    private new void OnCollisionEnter(Collision other)
     {
         base.OnCollisionEnter(other);
         if (other.transform.CompareTag(Constant.TAG_DOOR))
@@ -142,8 +142,7 @@ public class Bot : CharacterBase
     {
         myStair = LevelManager.Ins.currentLevelSettings.GetStair(score);
         if (myStair == null)
-            Invoke(Constant.STR_DESTROY, 4f);
+            Invoke("DestroyMe", 4f);
     }
-
     private void DestroyMe() => Destroy(gameObject);
 }

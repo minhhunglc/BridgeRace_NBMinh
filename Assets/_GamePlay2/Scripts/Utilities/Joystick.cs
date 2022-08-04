@@ -9,7 +9,7 @@ public class Joystick : MonoBehaviour
     private Vector2 _startPos;
     private Vector2 _endPos;
 
-    private float _minDistance = 40;
+    private float _minDistance = 5;
 
     private void Update()
     {

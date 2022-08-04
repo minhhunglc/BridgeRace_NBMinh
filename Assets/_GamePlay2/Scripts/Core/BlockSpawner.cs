@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BlockSpawner : MonoBehaviour
+public class BlockSpawner : Singleton<BlockSpawner>
 {
-    [SerializeField] private GameObject _blockPrefab;
+    [SerializeField] public Block _blockPrefab;
 
     [SerializeField] private int _gridWitdh;
     [SerializeField] private int _gridHeight;
@@ -14,6 +14,10 @@ public class BlockSpawner : MonoBehaviour
 
     public BoxCollider _collider;
 
+    private void Awake()
+    {
+        SimplePool.Preload(_blockPrefab, 100, this.transform);
+    }
     void Start()
     {
         StartCoroutine(Spawn());
@@ -37,7 +41,7 @@ public class BlockSpawner : MonoBehaviour
                 posZ = transform.localPosition.z + zOffset + (j * _spaceZ);
 
                 PlayerBag playerBag = LevelManager.Ins.currentLevelSettings.GetRandomBag();
-                Block b = Instantiate(_blockPrefab, new Vector3(posX, transform.localPosition.y, posZ), Quaternion.identity).GetComponent<Block>();
+                Block b = Instantiate(_blockPrefab, new Vector3(posX, transform.localPosition.y, posZ), Quaternion.identity) as Block;
                 b.transform.parent = this.transform;
                 b.SetBlock(playerBag.playerId, playerBag.color);
                 yield return new WaitForSeconds(.001f);

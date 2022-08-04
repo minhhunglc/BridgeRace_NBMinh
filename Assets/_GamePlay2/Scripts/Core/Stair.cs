@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Stair : MonoBehaviour
+public class Stair : Singleton<Stair>
 {
     [Header("Transforms ")]
     [SerializeField] private GameObject _door;
@@ -10,7 +10,7 @@ public class Stair : MonoBehaviour
     [SerializeField] private Transform[] _sticks;
 
     [Header("Step ")]
-    [SerializeField] private GameObject _stepPrefab;
+    [SerializeField] private Step _stepPrefab;
     [SerializeField] private int _stepCount;
     public int stairLevel;
     private List<MeshRenderer> _steps = new List<MeshRenderer>();
@@ -20,11 +20,16 @@ public class Stair : MonoBehaviour
     [HideInInspector] public bool IsUsed;
     [HideInInspector] public bool IsFull;
 
+    private List<Step> _stepsList = new List<Step>();
+    private void Awake()
+    {
+        SimplePool.Preload(_stepPrefab, 30, this.transform);
+
+    }
     private void Start()
     {
         CreateStair();
     }
-
     private void CreateStair()
     {
 
@@ -32,10 +37,11 @@ public class Stair : MonoBehaviour
         {
             Vector3 pos = _stepPrefab.transform.localScale * i;
             pos.x = 0;
-            GameObject step = Instantiate(_stepPrefab);
+            Step step = Instantiate(_stepPrefab, pos, Quaternion.identity) as Step;
             step.transform.parent = this.transform;
             step.transform.localPosition = pos;
-            step.SetActive(false);
+            _stepsList.Add(step);
+            _stepsList[i].gameObject.SetActive(false);
             _steps.Add(step.GetComponent<MeshRenderer>());
         }
 

@@ -2,16 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Block : MonoBehaviour
+public class Block : GameUnit
 {
     public int Id;
-    private MeshRenderer _renderer;
-    private Collider _collider;
+    public MeshRenderer _renderer;
+    public Collider _collider;
 
-    private void Awake()
+    private void FixedUpdate()
     {
-        _renderer = GetComponent<MeshRenderer>();
-        _collider = GetComponent<Collider>();
+        if (transform.position.y < -4f)
+        {
+            transform.position = new Vector3(Random.Range(-4f, 4f), 0f, 0f);
+        }
     }
     public void SetBlock(int id, Color color)
     {
@@ -21,15 +23,25 @@ public class Block : MonoBehaviour
 
     public void CollectMe()
     {
-        _renderer.enabled = false;
-        _collider.enabled = false;
-        StartCoroutine(ShowMe());
+        if (this.Id == -1)
+        {
+            _renderer.enabled = true;
+            _collider.enabled = true;
+        }
+        else
+        {
+            _renderer.enabled = false;
+            _collider.enabled = false;
+
+            StartCoroutine(ShowMe());
+        }
     }
 
     private IEnumerator ShowMe()
     {
         float time = Random.Range(5, 10);
         yield return new WaitForSeconds(time);
+        this.gameObject.SetActive(true);
         _renderer.enabled = true;
         _collider.enabled = true;
     }

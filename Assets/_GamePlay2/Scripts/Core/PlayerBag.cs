@@ -51,7 +51,7 @@ public class PlayerBag
             blockCount = 0;
     }
 
-    public void DropAllBlocks(Transform transform)
+    public void DropAllBlocks(Transform tf)
     {
         if (blockCount == 0) return;
 
@@ -61,11 +61,9 @@ public class PlayerBag
 
         for (int i = 0; i < c; i++)
         {
-            GameObject g = GameObject.Instantiate(DataManager.Ins.BlockPrefab);
-            Block b = g.GetComponent<Block>();
+            Block b = SimplePool.Spawn(DataManager.Ins.BlockPrefab, new Vector3(tf.localPosition.x + Random.Range(-2, 2), tf.localPosition.y /*- .2f*/, tf.localPosition.z + Random.Range(-2, 2)), Quaternion.Euler(0, Random.Range(0, 180), 0)) as Block;
+            b.gameObject.GetComponent<BoxCollider>().isTrigger = false;
             b.Id = -1;
-            b.transform.localPosition = new Vector3(transform.localPosition.x + Random.Range(-2, 2), transform.localPosition.y /*- .2f*/, transform.localPosition.z + Random.Range(-2, 2));
-            b.transform.eulerAngles = new Vector3(0, Random.Range(0, 360), 0);
         }
 
     }
