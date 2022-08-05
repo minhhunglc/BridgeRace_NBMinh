@@ -13,10 +13,13 @@ public class Constant : MonoBehaviour
     public static string TAG_BLOCKSPAWNAREA = "BlockSpawnArea";
     public static string TAG_DOOR = "Door";
 
-    //Animation
+    //Animation Pref
     public static string PREFERENCE_ANIM_RUN = "isWalking";
     public static string PREFERENCE_ANIM_RESULT = "Result";
     public static string PREFERENCE_ANIM_FALL = "isFall";
+
+    //Animation
+    public static string ANIM_IDLE = "Armature|idle";
 
     //PlayerPref
     public static string PREF_LEVEL = "level";

@@ -18,6 +18,11 @@ public class Player : CharacterBase
         float vertical = _joystick.Vertical;
         float horizontal = _joystick.Horizontal;
         Move(horizontal, vertical);
+
+        if (transform.position.y < -5f)
+        {
+            transform.position = new Vector3(0f, 3f, -5.63f);
+        }
     }
 
     private void DropAction()

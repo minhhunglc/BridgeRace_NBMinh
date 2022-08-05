@@ -13,11 +13,6 @@ public class BlockSpawner : Singleton<BlockSpawner>
     [SerializeField] private float _spaceZ;
 
     public BoxCollider _collider;
-
-    private void Awake()
-    {
-        SimplePool.Preload(_blockPrefab, 100, this.transform);
-    }
     void Start()
     {
         StartCoroutine(Spawn());

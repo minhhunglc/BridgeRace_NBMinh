@@ -49,7 +49,6 @@ public class CharacterBase : Singleton<CharacterBase>, IAnimationState
         _mesh.material.color = bag.color;
         bag.SpawnBlocks();
     }
-
     #region  Collision
     protected void OnTriggerEnter(Collider other)
     {
@@ -103,7 +102,7 @@ public class CharacterBase : Singleton<CharacterBase>, IAnimationState
             {
                 GameManager.Ins.Win();
                 bag.ResetBag();
-
+                Win_Anim();
             }
         }
     }

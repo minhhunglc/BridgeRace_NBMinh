@@ -76,6 +76,11 @@ public class Bot : CharacterBase
 
         }
 
+        if (transform.position.y < -5f)
+        {
+            transform.position = new Vector3(0f, 3f, -5.63f);
+        }
+
     }
     private IEnumerator RotateMe()
     {
@@ -88,7 +93,7 @@ public class Bot : CharacterBase
         float t = 0;
         while (t < 1)
         {
-            t += Time.deltaTime * 5;
+            t += Time.deltaTime * 2;
             transform.localRotation = Quaternion.Slerp(transform.localRotation, Quaternion.Euler(newRot), t);
             yield return null;
         }

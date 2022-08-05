@@ -20,9 +20,18 @@ public class GameManager : Singleton<GameManager>
     }
     public void Play()
     {
-        GameStat = GameStatus.Playing;
-        Player.transform.position = LevelManager.Ins.currentLevelSettings.SpawnPoint.position;
-        Player.ResetPlayer();
+        try
+        {
+            GameStat = GameStatus.Playing;
+            Player.transform.position = LevelManager.Ins.currentLevelSettings.SpawnPoint.position;
+            Player.ResetPlayer();
+            Player.animator.Play(Constant.ANIM_IDLE);
+        }
+        catch (System.Exception)
+        {
+            throw;
+        }
+
     }
     public bool IsPlaying() { return GameStat == GameStatus.Playing; }
     public void GameOver()
@@ -54,6 +63,7 @@ public class GameManager : Singleton<GameManager>
         UIManager.Ins.ActivateWinPanel(false);
         LevelManager.Ins.FirstLevel();
         Play();
+        CharacterBase.Ins.Idle_Anim();
     }
     public void ReloadLevel()
     {
