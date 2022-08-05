@@ -26,4 +26,5 @@ public class Constant : MonoBehaviour
 
     //String
     public static string STR_LEVEL = "LEVEL: ";
+    public static string TEXT_PLAY = "GO";
 }

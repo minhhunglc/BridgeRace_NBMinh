@@ -9,6 +9,7 @@ public class DataManager : Singleton<DataManager>
 
     private void Awake()
     {
+        DontDestroyOnLoad(gameObject);
         SimplePool.Preload(BlockPrefab, 30, blockFalltf);
         Debug.Log("OK");
     }

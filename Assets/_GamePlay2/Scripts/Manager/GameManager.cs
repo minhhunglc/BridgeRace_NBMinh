@@ -15,7 +15,7 @@ public class GameManager : Singleton<GameManager>
 
     private void Start()
     {
-        //StartCoroutine(CountdownToStart());
+        StartCoroutine(CountdownToStart());
         Play();
     }
     public void Play()
@@ -29,7 +29,7 @@ public class GameManager : Singleton<GameManager>
         }
         catch (System.Exception)
         {
-            throw;
+            Debug.Log("Checked Player Position");
         }
 
     }
@@ -68,6 +68,7 @@ public class GameManager : Singleton<GameManager>
     public void ReloadLevel()
     {
         SceneManager.LoadScene(1);
+        SimplePool.CollectAll();
     }
     public void MainMenu()
     {
@@ -93,7 +94,7 @@ public class GameManager : Singleton<GameManager>
             yield return new WaitForSecondsRealtime(1f);
             countDownTime--;
         }
-        countdownDisplay.text = "GO";
+        countdownDisplay.text = Constant.TEXT_PLAY;
         Time.timeScale = 1;
         Play();
         yield return new WaitForSecondsRealtime(1f);

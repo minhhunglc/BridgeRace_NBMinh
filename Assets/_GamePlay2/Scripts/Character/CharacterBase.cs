@@ -29,6 +29,7 @@ public class CharacterBase : Singleton<CharacterBase>, IAnimationState
     protected bool IsBot;
     protected bool IsGround;
     protected bool IsBlock;
+    protected bool IsRunning;
     public int score;
 
     [Header("Components")]
@@ -140,15 +141,6 @@ public class CharacterBase : Singleton<CharacterBase>, IAnimationState
             }
 
             RemoveBlockInBag();
-            //else if (bag.blockCount == 0)
-            //{
-            //    MeshRenderer renderer = other.transform.GetComponent<MeshRenderer>();
-            //    if (renderer.material.color != bag.color)
-            //    {
-            //        ResetVelocity();
-            //        Debug.Log("OK");
-            //    }
-            //}
         }
     }
     #endregion
@@ -167,9 +159,6 @@ public class CharacterBase : Singleton<CharacterBase>, IAnimationState
             collisionAction.Invoke();
 
         bag.DropAllBlocks(transform);
-        //_rigidbody.AddForce(transform.up * 3000);
-
-
     }
     private void CollisionDetectionWithCharacter()
     {
@@ -177,20 +166,20 @@ public class CharacterBase : Singleton<CharacterBase>, IAnimationState
         RaycastHit hit;
         if (Physics.Raycast(transform.position, transform.forward, out hit, .6f, _layerMaskCollision))
         {
-            if (hit.collider != null && hit.transform.GetComponent<CharacterBase>().bag.blockCount < this.bag.blockCount)
+            var hitcol = hit.transform.GetComponent<CharacterBase>();
+            if (hit.collider != null)
             {
-                hit.transform.GetComponent<CharacterBase>().DropAllBlocks();
-                //Fall_Anim();
+                if (hitcol.bag.blockCount < this.bag.blockCount)
+                    hitcol.DropAllBlocks();
+                //hitcol.Fall_Anim();
+                //hitcol._rigidbody.isKinematic = true;
+                //hitcol._rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+                //hitcol.Idle_Anim();
+                ////hitcol.IsRunning = false;
                 //StartCoroutine(StopIimeToStand());
-                //if (animator.GetBool(Constant.PREFERENCE_ANIM_FALL))
-                //{
-                //    animator.SetBool(Constant.PREFERENCE_ANIM_FALL, false);
-                //    animator.SetInteger(Constant.PREFERENCE_ANIM_RESULT, 0);
-                //}
+                else this.DropAllBlocks();
             }
-
         }
-
     }
     #endregion
 
@@ -204,13 +193,15 @@ public class CharacterBase : Singleton<CharacterBase>, IAnimationState
 
     protected void Move(float horizontal, float vertical)
     {
+
         Debug.DrawRay(_rayPointGround.position, -_rayPointGround.up, Color.red);
         IsGround = Physics.Raycast(_rayPointGround.position, -_rayPointGround.up, _layerMaskGround);
 
-        if (vertical != 0 || horizontal != 0)
+        if (vertical != 0 || horizontal != 0 || !IsRunning)
         {
+            IsRunning = true;
             Quaternion newRot = Quaternion.Euler(0, (Mathf.Atan2(horizontal, vertical) * 180 / Mathf.PI), 0);
-            transform.rotation = Quaternion.Slerp(transform.rotation, newRot, Time.deltaTime * 5);
+            transform.rotation = Quaternion.Slerp(transform.rotation, newRot, Time.deltaTime * 2);
 
             if (IsGround)
             {
@@ -268,6 +259,14 @@ public class CharacterBase : Singleton<CharacterBase>, IAnimationState
         if (!animator.GetBool(Constant.PREFERENCE_ANIM_FALL))
         {
             animator.SetBool(Constant.PREFERENCE_ANIM_FALL, true);
+            animator.SetInteger(Constant.PREFERENCE_ANIM_RESULT, 0);
+        }
+    }
+    public void Stand_Anim()
+    {
+        if (animator.GetBool(Constant.PREFERENCE_ANIM_FALL))
+        {
+            animator.SetBool(Constant.PREFERENCE_ANIM_FALL, false);
             animator.SetInteger(Constant.PREFERENCE_ANIM_RESULT, 0);
         }
     }

@@ -93,7 +93,7 @@ public class Bot : CharacterBase
         float t = 0;
         while (t < 1)
         {
-            t += Time.deltaTime * 2;
+            t += Time.deltaTime * 10;
             transform.localRotation = Quaternion.Slerp(transform.localRotation, Quaternion.Euler(newRot), t);
             yield return null;
         }

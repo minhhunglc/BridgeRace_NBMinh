@@ -9,6 +9,7 @@ public interface IAnimationState
     void Running_Anim();
     void Idle_Anim();
     void Fall_Anim();
+    void Stand_Anim();
     void Win_Anim();
     void Lose_Anim();
 }
